@@ -1,0 +1,61 @@
+{
+  "id": "obs-controller",
+  "name": "OBS Controller",
+  "description": "Control OBS Studio scenes, streaming, recording, audio, and more via obs-websocket",
+  "version": "0.1.0",
+  "contracts": {
+    "tools": [
+      "obs_get_scenes",
+      "obs_get_current_scene",
+      "obs_switch_scene",
+      "obs_start_stream",
+      "obs_stop_stream",
+      "obs_get_stream_status",
+      "obs_start_recording",
+      "obs_stop_recording",
+      "obs_get_recording_status",
+      "obs_toggle_mute",
+      "obs_set_volume",
+      "obs_get_scene_items",
+      "obs_toggle_source",
+      "obs_get_stats",
+      "obs_get_version",
+      "obs_trigger_transition",
+      "obs_get_transitions",
+      "obs_set_transition",
+      "obs_save_replay",
+      "obs_start_virtualcam",
+      "obs_stop_virtualcam",
+      "obs_trigger_hotkey"
+    ]
+  },
+  "activation": {
+    "onStartup": true
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "host": {
+        "type": "string",
+        "default": "localhost",
+        "description": "OBS WebSocket host"
+      },
+      "port": {
+        "type": "number",
+        "default": 4455,
+        "description": "OBS WebSocket port"
+      },
+      "password": {
+        "type": "string",
+        "default": "",
+        "description": "OBS WebSocket password (from OBS → Settings → WebSocket Server)"
+      },
+      "reconnectIntervalMs": {
+        "type": "number",
+        "default": 5000,
+        "description": "Reconnect interval when connection drops"
+      }
+    }
+  }
+}
