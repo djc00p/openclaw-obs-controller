@@ -2,6 +2,17 @@
 
 Control OBS Studio directly from OpenClaw chat. Switch scenes, start/stop streaming/recording, manage audio, toggle sources, save replays, trigger hotkeys — all through natural language.
 
+## ⚠️ Important Safety Notice
+
+**This plugin gives your AI agent live control over OBS Studio.** The tools it provides can start streams, stop recordings, change scenes during a broadcast, toggle sources, and trigger arbitrary hotkeys — all of which can immediately affect a live production.
+
+- **Use tool allowlisting** — only expose `obs_*` tools to agents you trust with production control
+- **Configure confirmation rules** for destructive actions (`obs_start_stream`, `obs_stop_stream`, `obs_start_recording`, `obs_stop_recording`, `obs_trigger_hotkey`) if you want a human in the loop
+- **Set a strong OBS WebSocket password** — this plugin connects to your local OBS instance via WebSocket; anyone with access to that port can control your stream
+- **Be aware of prompt injection risk** — if an agent can trigger OBS actions based on chat input, untrusted content could theoretically induce scene switches or stream state changes
+
+These tools are powerful on purpose. Use them with the same caution you'd use for any live-production control surface.
+
 ## Requirements
 
 - [OpenClaw](https://openclaw.ai) gateway
