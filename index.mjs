@@ -35,9 +35,13 @@ export default definePluginEntry({
     registerItemTools(api, getClient);
     registerGeneralTools(api, getClient);
 
-    api.on("plugin_teardown", () => {
-      obsClient?.disconnect();
-      obsClient = null;
+    api.registerRuntimeLifecycle({
+      id: "obs-controller",
+      description: "Disconnect OBS WebSocket client when the plugin host tears down.",
+      cleanup: () => {
+        obsClient?.disconnect();
+        obsClient = null;
+      },
     });
   },
 });

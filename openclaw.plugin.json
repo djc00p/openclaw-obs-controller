@@ -2,7 +2,7 @@
   "id": "obs-controller",
   "name": "OBS Controller",
   "description": "Control OBS Studio scenes, streaming, recording, audio, and more via obs-websocket",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "contracts": {
     "tools": [
       "obs_get_scenes",
