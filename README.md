@@ -1,5 +1,7 @@
 # OBS Controller — OpenClaw Plugin
 
+[![ClawHub Plugin](https://img.shields.io/badge/ClawHub-Plugin-blue)](https://clawhub.ai/djc00p/obs-controller) [![OpenClaw](https://img.shields.io/badge/OpenClaw-Plugin-8A2BE2.svg)](https://openclaw.ai) [![OBS Studio](https://img.shields.io/badge/OBS-Studio-302E31.svg)](https://obsproject.com) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Control OBS Studio directly from OpenClaw chat. Switch scenes, start/stop streaming/recording, manage audio, toggle sources, save replays, trigger hotkeys — all through natural language.
 
 ## ⚠️ Important Safety Notice
