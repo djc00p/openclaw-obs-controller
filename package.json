@@ -1,6 +1,6 @@
 {
   "name": "@djc00p/obs-controller",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "description": "OpenClaw plugin to control OBS Studio via obs-websocket",
   "main": "./index.mjs",
@@ -24,6 +24,11 @@
     "tools/",
     "README.md",
     "SKILL.md",
-    "LICENSE"
-  ]
+    "LICENSE",
+    "test-transport.mjs",
+    "test-transport-live.mjs"
+  ],
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
 }

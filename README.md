@@ -11,6 +11,7 @@ Control OBS Studio directly from OpenClaw chat. Switch scenes, start/stop stream
 - **Use tool allowlisting** — only expose `obs_*` tools to agents you trust with production control
 - **Configure confirmation rules** for destructive actions (`obs_start_stream`, `obs_stop_stream`, `obs_start_recording`, `obs_stop_recording`, `obs_trigger_hotkey`) if you want a human in the loop
 - **Set a strong OBS WebSocket password** — this plugin connects to your local OBS instance via WebSocket; anyone with access to that port can control your stream
+- **Use TLS for anything that is not loopback** — OBS's WebSocket protocol does not encrypt traffic or authenticate the server, so a plaintext remote connection can be read and modified in transit. See [Transport Security](#-transport-security)
 - **Be aware of prompt injection risk** — if an agent can trigger OBS actions based on chat input, untrusted content could theoretically induce scene switches or stream state changes
 
 These tools are powerful on purpose. Use them with the same caution you'd use for any live-production control surface.
@@ -55,6 +56,71 @@ If your agent's tool policy restricts tools, whitelist the `obs_*` tools in `als
 | `port` | `4455` | OBS WebSocket port |
 | `password` | `""` | WebSocket password (set in OBS → Settings → WebSocket Server) |
 | `reconnectIntervalMs` | `5000` | Reconnect delay on disconnect |
+| `secure` | `false` | Use `wss://` (TLS) instead of `ws://`. **Required for any non-loopback host.** |
+| `allowInsecureRemote` | `false` | Allow an unencrypted `ws://` connection to a non-loopback host. See the warning below. |
+| `rejectUnauthorized` | `true` | Verify the TLS certificate chain and hostname on a `wss://` connection |
+| `ca` | — | PEM-encoded CA certificate, for a private PKI the system does not already trust |
+
+Every key can also be set through the environment: `OBS_WEBSOCKET_HOST`,
+`OBS_WEBSOCKET_PORT`, `OBS_WEBSOCKET_PASSWORD`, `OBS_RECONNECT_MS`,
+`OBS_WEBSOCKET_SECURE`, `OBS_ALLOW_INSECURE_REMOTE`,
+`OBS_TLS_REJECT_UNAUTHORIZED`, `OBS_TLS_CA`.
+
+---
+
+## 🔒 Transport Security
+
+**OBS's WebSocket protocol is not encrypted, and its password challenge does not authenticate the server.** The client proves it knows the password; the server never proves it is really OBS. Over a plaintext `ws://` connection that is not loopback, anyone on the network path can relay the handshake, then read or rewrite every control message — including scene switches, stream commands, and hotkeys.
+
+### What the plugin does
+
+| Host | Transport | Behavior |
+|---|---|---|
+| `localhost` / `127.0.0.1` | `ws://` | Allowed. The traffic never leaves the machine. |
+| Any host | `ws://` | **Refused** unless `allowInsecureRemote: true`. |
+| Any host | `wss://` | Allowed, with certificate and hostname verification on. |
+
+A refused connection fails fast with an explanatory error and does **not** enter the reconnect loop — a configuration that cannot succeed will not spin.
+
+### Connecting to a remote OBS over TLS
+
+Put OBS behind a TLS reverse proxy or an authenticated tunnel, then:
+
+```json
+{
+  "plugins": {
+    "entries": {
+      "obs-controller": {
+        "config": {
+          "host": "obs.example.com",
+          "port": 443,
+          "password": "your-obs-websocket-password",
+          "secure": true
+        }
+      }
+    }
+  }
+}
+```
+
+Certificate and hostname verification stay on. If your endpoint uses a private PKI, supply the CA explicitly:
+
+```json
+{ "secure": true, "ca": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----" }
+```
+
+Do not set `rejectUnauthorized: false` to work around a certificate problem — fix the certificate instead.
+
+### If you must use plaintext remotely
+
+Set `allowInsecureRemote: true` and understand what you are accepting: every OBS control message is readable and modifiable by anyone on the path. If you do this, also firewall the OBS port to the agent host and use a strong OBS password.
+
+### Tests
+
+```bash
+node test-transport.mjs          # 27 policy and config tests
+node test-transport-live.mjs      # 6 live TLS tests against a local server
+```
 
 ## Tools
 

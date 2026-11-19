@@ -8,6 +8,13 @@ import { registerGeneralTools } from "./tools/general.mjs";
 
 let obsClient = null;
 
+function parseBool(value) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value !== 0;
+  const v = String(value ?? "").trim().toLowerCase();
+  return v === "true" || v === "1" || v === "yes" || v === "on";
+}
+
 export default definePluginEntry({
   id: "obs-controller",
   name: "OBS Controller",
@@ -21,7 +28,27 @@ export default definePluginEntry({
     const password = process.env.OBS_WEBSOCKET_PASSWORD || config.password || "";
     const reconnectMs = parseInt(process.env.OBS_RECONNECT_MS || config.reconnectIntervalMs || 5000, 10);
 
-    obsClient = new ObsClient({ host, port, password, reconnectIntervalMs: reconnectMs });
+    // Transport security. `secure: true` uses wss:// (TLS). Plaintext
+    // ws:// to a non-loopback host is refused unless the administrator
+    // explicitly opts in with `allowInsecureRemote`.
+    const secure = parseBool(process.env.OBS_WEBSOCKET_SECURE ?? config.secure ?? false);
+    const allowInsecureRemote = parseBool(
+      process.env.OBS_ALLOW_INSECURE_REMOTE ?? config.allowInsecureRemote ?? false,
+    );
+    const rejectUnauthorized = parseBool(
+      process.env.OBS_TLS_REJECT_UNAUTHORIZED ?? config.rejectUnauthorized ?? true,
+    );
+
+    obsClient = new ObsClient({
+      host,
+      port,
+      password,
+      reconnectIntervalMs: reconnectMs,
+      secure,
+      allowInsecureRemote,
+      rejectUnauthorized,
+      ca: process.env.OBS_TLS_CA || config.ca,
+    });
 
     obsClient.connect().catch((err) => {
       console.error("[obs-controller] Connection failed:", err.message);

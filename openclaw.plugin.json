@@ -2,7 +2,7 @@
   "id": "obs-controller",
   "name": "OBS Controller",
   "description": "Control OBS Studio scenes, streaming, recording, audio, and more via obs-websocket",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "contracts": {
     "tools": [
       "obs_get_scenes",
@@ -55,6 +55,25 @@
         "type": "number",
         "default": 5000,
         "description": "Reconnect interval when connection drops"
+      },
+      "secure": {
+        "type": "boolean",
+        "default": false,
+        "description": "Use wss:// (TLS) for the OBS WebSocket connection. Required for any non-loopback host unless allowInsecureRemote is set."
+      },
+      "allowInsecureRemote": {
+        "type": "boolean",
+        "default": false,
+        "description": "Allow an unencrypted ws:// connection to a non-loopback host. OBS WebSocket auth does not encrypt traffic or authenticate the server, so anyone on the network path could read or alter control messages. Leave off unless the link is secured by other means."
+      },
+      "rejectUnauthorized": {
+        "type": "boolean",
+        "default": true,
+        "description": "Verify the TLS certificate chain and hostname on a wss:// connection. Leave enabled unless you supply a private CA via the ca option."
+      },
+      "ca": {
+        "type": "string",
+        "description": "PEM-encoded CA certificate for a private PKI, used to verify the wss:// endpoint. Only needed when the server uses a certificate your system does not already trust."
       }
     }
   }

@@ -31,6 +31,20 @@ Control OBS Studio directly from OpenClaw chat. Switch scenes, start/stop stream
 
 4. Optionally add `obs_*` tools to your agent's `alsoAllow` list
 
+## Transport Security
+
+The plugin connects over `ws://` (plaintext) to loopback by default. OBS's WebSocket protocol does not encrypt traffic and does not authenticate the server to the client, so a plaintext connection to a **non-loopback** host is refused unless you explicitly opt in.
+
+| Host | Transport | Behavior |
+|---|---|---|
+| `localhost` / `127.0.0.1` | `ws://` | Allowed |
+| Any host | `ws://` | Refused unless `allowInsecureRemote: true` |
+| Any host | `wss://` | Allowed, with certificate verification on |
+
+For a remote OBS instance, put OBS behind a TLS reverse proxy or an authenticated tunnel and set `"secure": true`. If the endpoint uses a private PKI, supply the CA with `"ca": "<PEM>"`. Certificate verification is on by default — do not disable it to work around a certificate problem.
+
+See the README for the full configuration reference.
+
 ## Tools
 
 **Scenes:** `obs_get_scenes`, `obs_get_current_scene`, `obs_switch_scene`
